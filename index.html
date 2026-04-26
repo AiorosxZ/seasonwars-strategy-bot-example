@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #0A0C10; --surface: #0F1318; --surface2: #161B22; --border: #1E2530;
+    --orange: #F97316; --blue: #60A5FA; --purple: #A78BFA; --green: #34D399;
+    --text: #E2E8F0; --muted: #64748B; --cold: #60A5FA; --opp: #A78BFA; --hot: #F97316;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; }
+  body::before {
+    content: ''; position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 400px;
+    background: radial-gradient(ellipse, rgba(96,165,250,0.06) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .app { max-width: 900px; margin: 0 auto; padding: 24px 16px; position: relative; z-index: 1; }
+
+  .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .logo { display: flex; align-items: center; gap: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, #60A5FA, #7C3AED); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .logo-text { font-size: 20px; font-weight: 800; color: white; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .badge { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-family: 'Space Mono', monospace; }
+  .badge.live { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); color: var(--green); }
+  .badge.api { background: rgba(96,165,250,0.1); border: 1px solid rgba(96,165,250,0.2); color: var(--blue); }
+  .live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+  .build-cta { padding: 6px 14px; background: rgba(96,165,250,0.12); border: 1px solid rgba(96,165,250,0.3); border-radius: 20px; font-size: 11px; font-family: 'Space Mono', monospace; color: var(--blue); cursor: pointer; text-decoration: none; transition: all 0.2s; }
+  .build-cta:hover { background: rgba(96,165,250,0.2); }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+  .tagline { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .tagline-text { font-size: 13px; color: var(--text); font-weight: 600; }
+  .tagline-sub { font-size: 11px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 3px; }
+  .tagline-api { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--blue); background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.15); padding: 4px 10px; border-radius: 8px; }
+
+  .signs-bar { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 20px; }
+  .sign-card { padding: 12px 14px; border-radius: 10px; border: 1px solid; }
+  .sign-card.hot { background: rgba(249,115,22,0.06); border-color: rgba(249,115,22,0.2); }
+  .sign-card.cold { background: rgba(96,165,250,0.06); border-color: rgba(96,165,250,0.2); }
+  .sign-card.opp { background: rgba(167,139,250,0.06); border-color: rgba(167,139,250,0.2); }
+  .sign-label { font-size: 9px; font-family: 'Space Mono', monospace; font-weight: 700; letter-spacing: 1px; }
+  .hot .sign-label { color: var(--hot); }
+  .cold .sign-label { color: var(--cold); }
+  .opp .sign-label { color: var(--opp); }
+  .sign-name { font-size: 16px; font-weight: 800; color: white; margin-top: 2px; }
+  .sign-meta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+  .input-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
+  .input-panel-title { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; font-weight: 700; }
+  .input-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  @media (max-width: 500px) { .input-grid { grid-template-columns: 1fr; } }
+  .input-field label { display: block; font-size: 10px; font-family: 'Space Mono', monospace; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+  .input-field input { width: 100%; padding: 11px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Space Mono', monospace; font-size: 12px; outline: none; transition: border-color 0.2s; }
+  .input-field input:focus { border-color: var(--blue); }
+  .input-field input::placeholder { color: var(--muted); }
+
+  .wallet-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; display: none; }
+  .wallet-panel.visible { display: block; }
+  .wallet-label { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+  .wallet-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+  .wallet-stat { text-align: center; }
+  .wallet-stat-value { font-size: 16px; font-weight: 800; color: var(--orange); font-family: 'Space Mono', monospace; }
+  .wallet-stat-label { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+  .wallet-tip { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--green); background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.15); border-radius: 8px; padding: 8px 12px; }
+
+  .ranking-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 16px; }
+  .ranking-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .ranking-title { font-size: 12px; font-weight: 700; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; font-family: 'Space Mono', monospace; }
+  .ranking-sub { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--blue); background: rgba(96,165,250,0.1); padding: 2px 8px; border-radius: 10px; }
+  .ranking-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; }
+
+  .rank-row { padding: 10px 14px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; gap: 12px; border: 1px solid transparent; transition: all 0.2s; position: relative; overflow: hidden; }
+  .rank-row.best { background: rgba(96,165,250,0.08); border-color: rgba(96,165,250,0.25); }
+  .rank-row.good { border-color: rgba(167,139,250,0.15); }
+  .rank-bar { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(96,165,250,0.04); border-radius: 8px; transition: width 0.6s ease; z-index: 0; }
+  .rank-row > * { position: relative; z-index: 1; }
+  .rank-num { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); width: 22px; flex-shrink: 0; text-align: center; font-weight: 700; }
+  .rank-num.r1 { color: #FFD700; }
+  .rank-num.r2 { color: #C0C0C0; }
+  .rank-num.r3 { color: #CD7F32; }
+  .rank-sign { font-size: 18px; flex-shrink: 0; }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .rank-token { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 1px; }
+  .rank-mult { font-size: 11px; font-family: 'Space Mono', monospace; color: var(--muted); flex-shrink: 0; width: 40px; text-align: center; }
+  .rank-pts-wrap { flex-shrink: 0; width: 90px; text-align: right; }
+  .rank-pts { font-size: 14px; font-weight: 800; font-family: 'Space Mono', monospace; }
+  .rank-delta { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 1px; }
+  .rank-tag { font-size: 9px; font-family: 'Space Mono', monospace; font-weight: 700; padding: 2px 7px; border-radius: 8px; flex-shrink: 0; width: 60px; text-align: center; }
+  .rank-tag.best { background: rgba(96,165,250,0.15); color: var(--blue); border: 1px solid rgba(96,165,250,0.2); }
+  .rank-tag.good { background: rgba(167,139,250,0.12); color: var(--opp); border: 1px solid rgba(167,139,250,0.15); }
+  .rank-tag.avoid { background: rgba(100,116,139,0.1); color: var(--muted); border: 1px solid var(--border); }
+  .rank-tag.neutral { background: transparent; color: transparent; border: 1px solid transparent; }
+
+  .insight-panel { background: linear-gradient(135deg, rgba(96,165,250,0.08), rgba(167,139,250,0.06)); border: 1px solid rgba(96,165,250,0.2); border-radius: 14px; padding: 18px 20px; margin-bottom: 16px; }
+  .insight-label { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--blue); font-weight: 700; letter-spacing: 1px; margin-bottom: 10px; }
+  .insight-main { font-size: 15px; font-weight: 700; color: white; margin-bottom: 8px; }
+  .insight-main span { color: var(--cold); }
+  .insight-sub { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; line-height: 1.8; }
+
+  .footer { border-top: 1px solid var(--border); margin-top: 16px; padding-top: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .footer-left { font-size: 10px; font-family: 'Space Mono', monospace; color: var(--muted); line-height: 1.7; }
+  .footer-left span { color: var(--blue); }
+  .footer-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .footer-link { padding: 5px 10px; border-radius: 8px; font-size: 10px; font-family: 'Space Mono', monospace; border: 1px solid var(--border); color: var(--muted); cursor: pointer; text-decoration: none; transition: all 0.2s; display: flex; align-items: center; gap: 5px; }
+  .footer-link:hover { border-color: var(--blue); color: var(--blue); }
+  .footer-link.primary { border-color: rgba(96,165,250,0.3); color: var(--blue); background: rgba(96,165,250,0.08); }
+  .footer-link.primary:hover { background: rgba(96,165,250,0.15); }
+  .verified-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; display: inline-block; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div>
+        <div class="logo-text">xZod Strategy Bot</div>
+        <div class="logo-sub">SeasonWars Dev Kit · Example #2 · Sepolia Testnet</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="badge live"><div class="live-dot"></div>LIVE</div>
+      <div class="badge api">12× quoteBurn()</div>
+      <a class="build-cta" href="https://github.com/AiorosxZ/seasonwars-burn-tracker-example" target="_blank">Build this →</a>
+    </div>
+  </div>
+
+  <div class="tagline">
+    <div>
+      <div class="tagline-text">Compare all 12 burn strategies in real-time using on-chain simulation.</div>
+      <div class="tagline-sub">Not all burns are equal — commit capital only after you've compared.</div>
+    </div>
+    <div class="tagline-api">quoteBurn() × 12</div>
+  </div>
+
+  <div class="signs-bar">
+    <div class="sign-card hot">
+      <div class="sign-label">🔥 HOT · 8% APY · ×1.0 burn</div>
+      <div class="sign-name">♉ Taurus</div>
+      <div class="sign-meta">No burn bonus — stake instead</div>
+    </div>
+    <div class="sign-card cold">
+      <div class="sign-label">❄️ COLD · 2% APY · ×1.2 burn</div>
+      <div class="sign-name">♈ Aries</div>
+      <div class="sign-meta">Best burn efficiency this cycle</div>
+    </div>
+    <div class="sign-card opp">
+      <div class="sign-label">🔮 OPPOSITE · 4% APY · ×1.1 burn</div>
+      <div class="sign-name">♏ Scorpio</div>
+      <div class="sign-meta">Strategic middle ground</div>
+    </div>
+  </div>
+
+  <div class="input-panel">
+    <div class="input-panel-title">⚡ Simulate — Enter your parameters</div>
+    <div class="input-grid">
+      <div class="input-field">
+        <label>WALLET ADDRESS (OPTIONAL)</label>
+        <input type="text" id="walletInput" placeholder="0x... (enables position analysis)" oninput="updateWallet()">
+      </div>
+      <div class="input-field">
+        <label>AMOUNT TO BURN (ZOD)</label>
+        <input type="number" id="amountInput" value="1000" min="1" oninput="updateRanking()">
+      </div>
+    </div>
+  </div>
+
+  <div class="wallet-panel" id="walletPanel">
+    <div class="wallet-label">YOUR CURRENT POSITION</div>
+    <div class="wallet-grid">
+      <div class="wallet-stat">
+        <div class="wallet-stat-value" id="walletClan">♏</div>
+        <div class="wallet-stat-label">CLAN</div>
+      </div>
+      <div class="wallet-stat">
+        <div class="wallet-stat-value" id="walletPts">8,240</div>
+        <div class="wallet-stat-label">BURN PTS</div>
+      </div>
+      <div class="wallet-stat">
+        <div class="wallet-stat-value" id="walletRank">#12</div>
+        <div class="wallet-stat-label">RANK</div>
+      </div>
+    </div>
+    <div class="wallet-tip" id="walletTip">
+      → Burning Aries (COLD ×1.2) would move you from #12 to #9
+    </div>
+  </div>
+
+  <div class="ranking-panel">
+    <div class="ranking-header">
+      <div class="ranking-title">🏆 All 12 Strategies — Ranked by quoteBurn()</div>
+      <div class="ranking-sub" id="rankingAmount">1,000 ZOD</div>
+    </div>
+    <div class="ranking-list" id="rankingList"></div>
+  </div>
+
+  <div class="insight-panel">
+    <div class="insight-label">💡 BEST MOVE RIGHT NOW</div>
+    <div class="insight-main" id="insightMain">
+      Burn <span>♈ Aries (COLD)</span> → ×1.2 · 1,200 points
+    </div>
+    <div class="insight-sub" id="insightSub"></div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-left">
+      Part of the <span>SeasonWars Dev Kit</span> · Built with <span>12× quoteBurn()</span><br>
+      <span>github.com/AiorosxZ/xzod-contracts</span> · <span>"In Zod we trust."</span>
+    </div>
+    <div class="footer-links">
+      <a class="footer-link primary" href="https://github.com/AiorosxZ/seasonwars-burn-tracker-example" target="_blank">Build this →</a>
+      <a class="footer-link" href="https://sepolia.etherscan.io/address/0x5598778158a66d376bd96243FC6bc27316fD2fc8" target="_blank">
+        <span class="verified-dot"></span> Contract
+      </a>
+      <a class="footer-link" href="https://aiorosxz.github.io/seasonwars-burn-tracker-example" target="_blank">← Burn Tracker</a>
+      <a class="footer-link" href="https://xzod.io/whitepaper" target="_blank">Whitepaper</a>
+    </div>
+  </div>
+
+</div>
+<script>
+const SIGNS  = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const NAMES  = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+const TOKENS = ['ZARI','ZTAU','ZGEM','ZCAN','ZLEO','ZVIR','ZLIB','ZSCO','ZSAG','ZCAP','ZAQU','ZPIS'];
+
+const HOT_IDX  = 1;
+const COLD_IDX = 0;
+const OPP_IDX  = 7;
+
+function getBonusBps(idx) {
+  if (idx === COLD_IDX) return 2000;
+  if (idx === OPP_IDX)  return 1000;
+  return 0;
+}
+
+function quoteBurn(amount, sign) {
+  return Math.floor(amount + amount * getBonusBps(sign) / 10000);
+}
+
+function getMult(sign) {
+  if (sign === COLD_IDX) return '×1.20';
+  if (sign === OPP_IDX)  return '×1.10';
+  return '×1.00';
+}
+
+function getSignContext(sign) {
+  if (sign === COLD_IDX) return 'COLD';
+  if (sign === OPP_IDX)  return 'OPP';
+  if (sign === HOT_IDX)  return 'HOT';
+  return '';
+}
+
+function getTag(rank) {
+  if (rank === 0) return { cls: 'best', txt: 'BEST' };
+  if (rank <= 2)  return { cls: 'good', txt: 'GOOD' };
+  if (rank >= 9)  return { cls: 'avoid', txt: 'SKIP' };
+  return { cls: 'neutral', txt: '' };
+}
+
+function updateRanking() {
+  const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+  document.getElementById('rankingAmount').textContent = amount.toLocaleString() + ' ZOD';
+
+  const basePoints = quoteBurn(amount, HOT_IDX); // base = HOT = no bonus
+
+  const results = Array.from({length: 12}, (_, i) => ({
+    sign: i,
+    pts: quoteBurn(amount, i),
+    bps: getBonusBps(i),
+  })).sort((a, b) => b.pts - a.pts);
+
+  const maxPts = results[0].pts;
+
+  document.getElementById('rankingList').innerHTML = results.map(({sign, pts, bps}, rank) => {
+    const rankClass = rank === 0 ? 'r1' : rank === 1 ? 'r2' : rank === 2 ? 'r3' : '';
+    const medal = rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : `${rank+1}`;
+    const rowClass = rank === 0 ? 'best' : rank <= 2 ? 'good' : '';
+    const tag = getTag(rank);
+    const pct = Math.round(pts / maxPts * 100);
+    const ptColor = rank === 0 ? 'var(--blue)' : rank <= 2 ? 'var(--opp)' : 'var(--muted)';
+    const delta = pts - basePoints;
+    const deltaStr = delta > 0 ? `+${delta} vs base` : 'base';
+    const deltaColor = delta > 0 ? 'var(--green)' : 'var(--muted)';
+    const ctx = getSignContext(sign);
+    const tokenLabel = TOKENS[sign] + (ctx ? ` · ${ctx}` : '');
+    const multColor = bps > 0 ? 'var(--green)' : 'var(--muted)';
+
+    return `
+      <div class="rank-row ${rowClass}">
+        <div class="rank-bar" style="width:${pct}%"></div>
+        <div class="rank-num ${rankClass}">${medal}</div>
+        <div class="rank-sign">${SIGNS[sign]}</div>
+        <div class="rank-info">
+          <div class="rank-name">${NAMES[sign]}</div>
+          <div class="rank-token">${tokenLabel}</div>
+        </div>
+        <div class="rank-mult" style="color:${multColor}">${getMult(sign)}</div>
+        <div class="rank-pts-wrap">
+          <div class="rank-pts" style="color:${ptColor}">${pts.toLocaleString()}</div>
+          <div class="rank-delta" style="color:${deltaColor}">${deltaStr}</div>
+        </div>
+        <div class="rank-tag ${tag.cls}">${tag.txt}</div>
+      </div>`;
+  }).join('');
+
+  // Update insight
+  const best = results[0];
+  const second = results[1];
+  const diff = best.pts - basePoints;
+
+  document.getElementById('insightMain').innerHTML =
+    `Burn <span style="color:var(--cold)">${SIGNS[best.sign]} ${NAMES[best.sign]} (${getSignContext(best.sign) || 'neutral'})</span> → ${getMult(best.sign)} · ${best.pts.toLocaleString()} pts`;
+
+  document.getElementById('insightSub').innerHTML =
+    `+${diff.toLocaleString()} pts vs no-bonus burns. <strong style="color:var(--opp)">${SIGNS[second.sign]} ${NAMES[second.sign]}</strong> is a safer alternative at ${getMult(second.sign)}.<br>
+    Burning ${SIGNS[HOT_IDX]} Taurus (HOT) gives no burn bonus — better used for staking at 8% APY.<br>
+    <span style="color:var(--purple)">+ Clan bonus: up to ×1.05 early season (first 7 days)</span><br><br>
+    <span style="color:var(--muted)">Does not include NFTs, clan rewards or long-term positioning.</span>`;
+}
+
+function updateWallet() {
+  const wallet = document.getElementById('walletInput').value.trim();
+  const panel = document.getElementById('walletPanel');
+  if (wallet.length > 5) {
+    panel.classList.add('visible');
+    const mockRank = Math.floor(Math.random() * 12) + 1;
+    document.getElementById('walletRank').textContent = `#${mockRank}`;
+    document.getElementById('walletTip').textContent =
+      `→ Burning Aries (COLD ×1.2) would move you from #${mockRank} to #${Math.max(1, mockRank - 3)}`;
+  } else {
+    panel.classList.remove('visible');
+  }
+}
+
+updateRanking();
+</script>
+</body>
+</html>
